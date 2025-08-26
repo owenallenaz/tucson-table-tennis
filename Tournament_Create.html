@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>TTTC Tournament Sign-In Roster</title>
+  <style>
+    :root{
+      --bg:#0f172a;--fg:#e2e8f0;--muted:#94a3b8;--panel:#0b1120;--border:#1f2937;--field:#0b1224;
+      --accent:#22c55e;--warn:#f59e0b;--bad:#ef4444;--good:#10b981;--id:#facc15;--link:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1023,#0c1328);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .app{max-width:1100px;margin:16px auto;background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden}
+    header{padding:20px 16px;background:radial-gradient(900px 260px at right -100px top -120px,rgba(96,165,250,.12),transparent),var(--panel);border-bottom:1px solid var(--border)}
+    header h1{margin:0;font-size:22px}
+    header p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    main{padding:14px 16px 28px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    button,input,select{background:var(--field);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px}
+    button{cursor:pointer}
+    button.warn{background:var(--warn);color:#111;border-color:transparent}
+    button.ghost{background:transparent;border-color:transparent}
+    input[type="file"]{background:transparent;border:0;color:var(--muted);padding:0}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#111827;color:var(--muted);font-size:12px}
+    .hint{color:var(--muted);font-size:13px}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+    th,td{border-bottom:1px solid var(--border);padding:8px;text-align:left}
+    thead th{background:#0b1328;user-select:none;cursor:pointer}
+    td input, td select{width:100%}
+
+    /* Larger, easier-to-click checkboxes in roster */
+    td.check-cell { padding:10px 8px; }
+    td.check-cell input[type="checkbox"]{
+      transform: scale(1.6);
+      width: 22px; height: 22px;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>TTTC Tournament Sign-In Roster</h1>
+    <p>Load <code>players_template.csv</code>, check who’s present, assign group letters (A-D), sort any column, and export.</p>
+  </header>
+  <main>
+    <section id="io">
+      <h2>1) Load / Save</h2>
+      <div class="grid">
+        <div>
+          <div class="row">
+            <span class="pill">Players CSV</span>
+            <input id="playersFile" type="file" accept=".csv,.txt"/>
+            <button id="downloadPlayersTemplate" class="ghost">Download template</button>
+            <button id="exportPlayersOriginal" class="ghost">Export (original headers)</button>
+            <button id="exportPlayersSignin" class="ghost">Export sign-in CSV</button>
+          </div>
+          <div class="hint">Headers required: <code>player_id, First_Name, Last_Name, Rating, Last_Update</code>. (Last_Update is hidden in the table)</div>
+        </div>
+        <div>
+          <div class="row">
+            <button id="loadSample" class="ghost">Load sample data</button>
+            <button id="clearAll" class="ghost">Clear</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="players">
+      <h2>2) Roster & Sign-In</h2>
+      <div class="row">
+        <button id="addPlayer">Add player</button>
+        <button id="toggleAbsent" class="ghost">Hide absent</button>
+        <span id="playersCount" class="hint"></span>
+        <span id="status" class="hint"></span>
+      </div>
+      <table>
+        <thead id="playersHead">
+          <tr>
+            <th data-sort="Present">Present</th>
+            <th data-sort="Group">Group</th>
+            <th data-sort="player_id">player_id</th>
+            <th data-sort="First_Name">First_Name</th>
+            <th data-sort="Last_Name">Last_Name</th>
+            <th data-sort="Rating">Rating</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="playersBody"></tbody>
+      </table>
+      <div class="hint">Tip: Click any header to sort. Use the “Hide absent” toggle to filter rows.</div>
+    </section>
+  
+    <section id="display">
+      <h2>3) Display Groups</h2>
+      <div class="row">
+        <button id="displayGroups" class="ghost">Display groups (Present players)</button>
+        <span class="hint">Shows A–D groups with assigned players, sorted by rating (desc). Only present players included.</span>
+      </div>
+      <div id="groupsPreview" style="margin-top:12px"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+// --- Helpers ---
+function todayUS(){
+  var d=new Date(); var m=d.getMonth()+1, day=d.getDate(), y=d.getFullYear();
+  function pad(n){return (n<10?'0':'')+n;}
+  return m+'/'+pad(day)+'/'+y;
+}
+function parseDSV(text, delim){
+  var rows=[];var i=0,field='',row=[],inQ=false; text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  function endF(){row.push(field);field=''}; function endR(){rows.push(row);row=[]}
+  while(i<text.length){var c=text[i++]; if(inQ){ if(c=='\"'){ if(text[i]=='\"'){field+='\"';i++} else inQ=false } else field+=c }
+  else { if(c=='\"') inQ=true; else if(c===delim) endF(); else if(c=='\n'){ endF(); endR(); } else field+=c } }
+  endF(); endR(); if(rows.length&&rows[rows.length-1].every(function(x){return x==='';})) rows.pop();
+  if(!rows.length) return {headers:[],records:[]};
+  var headers=rows[0].map(function(h){return (h||'').trim();});
+  var records=rows.slice(1).map(function(r){var o={}; for(var idx=0; idx<headers.length; idx++){ var h=headers[idx]; var v=(r[idx]==null?'':r[idx]).trim(); o[h]=v; } return o;});
+  return {headers:headers,records:records,delim:delim};
+}
+function parseAuto(text){ text=String(text).replace(/^\uFEFF/,'');
+  var first=(text.split(/\r\n|\n|\r/,1)[0]||''); 
+  var counts={',':(first.match(/,/g)||[]).length,'\\t':(first.match(/\t/g)||[]).length,';':(first.match(/;/g)||[]).length};
+  var d=','; if(counts['\\t']>counts[','] && counts['\\t']>=counts[';']) d='\\t'; else if(counts[';']>counts[',']) d=';';
+  return parseDSV(text,d);
+}
+function toCSV(rows, headers){
+  var lines=[headers.join(',')];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var line=headers.map(function(h){var v=r[h]; if(v==null) v=''; v=String(v); if(/[",\n\r]/.test(v)) v='"'+v.replace(/"/g,'""')+'"'; return v;}).join(',');
+    lines.push(line);
+  }
+  return lines.join('\r\n');
+}
+function downloadCSV(filename, csv){ var blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); }
+
+// --- Data state ---
+// each: {player_id, First_Name, Last_Name, Rating, Last_Update, Present, Group}
+var players=[];
+var hideAbsent=false;
+var sortState={key:'Rating', dir:-1}; // default: rating desc
+
+function renderPlayers(){
+  var tb=document.getElementById('playersBody'); tb.innerHTML='';
+  var view = players.filter(function(p){ return hideAbsent ? !!p.Present : true; });
+  var key=sortState.key; var dir=sortState.dir;
+  var sorted=view.slice().sort(function(a,b){
+    var va=(a[key]==null?'':a[key]); var vb=(b[key]==null?'':b[key]);
+    if(key==='Rating'){ return (Number(vb||0)-Number(va||0)); } // desc
+    if(key==='Present'){ return ((vb?1:0)-(va?1:0))*dir; }
+    return String(va).localeCompare(String(vb), undefined, {numeric:true})*dir;
+  });
+  for(var s=0;s<sorted.length;s++){
+    var p=sorted[s]; var idx=players.indexOf(p);
+    var tr=document.createElement('tr');
+    var options = ['A','B','C','D'].map(function(g){
+      return '<option value="'+g+'" '+(p.Group===g?'selected':'')+'>'+g+'</option>';
+    }).join('');
+    tr.innerHTML=
+      '<td class="check-cell" style="text-align:center"><input type="checkbox" '+(p.Present? 'checked':'')+' data-idx="'+idx+'" data-field="Present"/></td>'+
+      '<td><select data-idx="'+idx+'" data-field="Group"><option value=""></option>'+options+'</select></td>'+
+      '<td><input value="'+(p.player_id||'')+'" data-idx="'+idx+'" data-field="player_id"/></td>'+
+      '<td><input value="'+(p.First_Name||'')+'" data-idx="'+idx+'" data-field="First_Name"/></td>'+
+      '<td><input value="'+(p.Last_Name||'')+'" data-idx="'+idx+'" data-field="Last_Name"/></td>'+
+      '<td><input type="number" step="1" value="'+(p.Rating||'')+'" data-idx="'+idx+'" data-field="Rating"/></td>'+
+      '<td><button class="warn" data-action="del" data-idx="'+idx+'">Delete</button></td>';
+    tb.appendChild(tr);
+  }
+  document.getElementById('playersCount').textContent=(view.length)+' shown / '+(players.length)+' total';
+}
+
+// --- Events ---
+var head=document.getElementById('playersHead');
+head.addEventListener('click', function(e){
+  var th=e.target.closest('[data-sort]'); if(!th) return; var key=th.getAttribute('data-sort');
+  sortState = { key: key, dir: (sortState.key===key ? -sortState.dir : (key==='Rating'?-1:1)) };
+  renderPlayers();
+});
+
+document.getElementById('addPlayer').addEventListener('click', function(){
+  players.push({player_id:'', First_Name:'', Last_Name:'', Rating:'', Last_Update:todayUS(), Present:true, Group:''});
+  renderPlayers();
+});
+
+document.getElementById('players').addEventListener('click', function(e){
+  var btn=e.target.closest('button[data-action="del"]'); if(!btn) return; var i=Number(btn.getAttribute('data-idx'));
+  players.splice(i,1); renderPlayers();
+});
+
+// Update model on input, but DO NOT re-render on every keystroke (prevents jump while typing).
+document.getElementById('players').addEventListener('input', function(e){
+  var t=e.target; if(!t.dataset) return; var i=Number(t.dataset.idx); var f=t.dataset.field; if(!(isFinite(i))||!f) return;
+  if(f==='Present'){ players[i][f]=t.checked; renderPlayers(); return; } // immediate for checkbox
+  if(t.tagName==='SELECT'){ players[i][f]=t.value; renderPlayers(); return; } // immediate for select
+  if(f==='Rating'){ players[i][f]=t.value!=='' ? String(Math.trunc(Number(t.value))) : ''; }
+  else { players[i][f]=t.value; }
+});
+// Re-render on commit (blur or Enter) so sort updates but rows don't jump while typing.
+document.getElementById('players').addEventListener('change', function(e){
+  var t=e.target; if(!t.dataset) return; var i=Number(t.dataset.idx); var f=t.dataset.field; if(!(isFinite(i))||!f) return;
+  renderPlayers();
+});
+document.getElementById('players').addEventListener('keydown', function(e){
+  if(e.key==='Enter'){ var t=e.target; if(!t.dataset) return; renderPlayers(); }
+});
+
+var toggleBtn=document.getElementById('toggleAbsent');
+toggleBtn.addEventListener('click', function(){ hideAbsent=!hideAbsent; toggleBtn.textContent= hideAbsent? 'Show all' : 'Hide absent'; renderPlayers(); });
+
+function setStatus(msg, cls){ var s=document.getElementById('status'); s.textContent=msg||''; s.className='hint '+(cls||''); }
+
+// --- Load / Save ---
+document.getElementById('downloadPlayersTemplate').addEventListener('click', function(){
+  var headers=['player_id','First_Name','Last_Name','Rating','Last_Update'];
+  var sample=[
+    {player_id:'101', First_Name:'Alice', Last_Name:'Example', Rating:'1700', Last_Update:todayUS()},
+    {player_id:'102', First_Name:'Bob', Last_Name:'Example', Rating:'1450', Last_Update:todayUS()}
+  ];
+  downloadCSV('players_template.csv', toCSV(sample, headers));
+});
+
+document.getElementById('playersFile').addEventListener('change', function(e){
+  var file=(e.target.files && e.target.files[0]) ? e.target.files[0] : null; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    var parsed=parseAuto(reader.result);
+    var headers=parsed.headers, records=parsed.records;
+    var req=['player_id','First_Name','Last_Name','Rating','Last_Update'];
+    var miss=req.filter(function(r){return headers.indexOf(r)===-1;});
+    if(miss.length){ alert('Players file missing: '+miss.join(', ')+'\nFound headers: '+headers.join(', ')); return; }
+    players = records.map(function(r){
+      return {
+        player_id:r.player_id, First_Name:r.First_Name, Last_Name:r.Last_Name,
+        Rating:r.Rating, Last_Update:r.Last_Update,
+        Present: (r.Present ? (String(r.Present).toLowerCase()==='true' || r.Present==='1' || String(r.Present).toLowerCase()==='yes') : false),
+        Group: r.Group || ''
+      };
+    });
+    hideAbsent=false; toggleBtn.textContent='Hide absent';
+    setStatus('Loaded players','ok');
+    renderPlayers();
+  };
+  reader.readAsText(file);
+});
+
+// Export players_template.csv (original headers, preserve Last_Update; assign today for blank/new)
+document.getElementById('exportPlayersOriginal').addEventListener('click', function(){
+  if(!players.length){ alert('No players to export.'); return; }
+  var headers=['player_id','First_Name','Last_Name','Rating','Last_Update'];
+  var rows=players.map(function(p){
+    return {
+      player_id:p.player_id, First_Name:p.First_Name, Last_Name:p.Last_Name,
+      Rating:p.Rating, Last_Update:(p.Last_Update && String(p.Last_Update).trim()? p.Last_Update : todayUS())
+    };
+  });
+  downloadCSV('players_template.csv', toCSV(rows, headers));
+});
+
+// Export sign-in CSV (with Present/Group) — Last_Update not required here
+document.getElementById('exportPlayersSignin').addEventListener('click', function(){
+  if(!players.length){ alert('No players to export.'); return; }
+  var headers=['player_id','First_Name','Last_Name','Rating','Present','Group'];
+  var rows=players.map(function(p){
+    return {player_id:p.player_id, First_Name:p.First_Name, Last_Name:p.Last_Name, Rating:p.Rating, Present: p.Present ? 'true':'false', Group:p.Group||''};
+  });
+  downloadCSV('players_signin.csv', toCSV(rows, headers));
+});
+
+// Sample data
+document.getElementById('loadSample').addEventListener('click', function(){
+  players=[
+    {player_id:'1', First_Name:'James', Last_Name:'Abanishe', Rating:'993', Last_Update:todayUS(), Present:true, Group:'A'},
+    {player_id:'2', First_Name:'Owen', Last_Name:'Allen', Rating:'1925', Last_Update:todayUS(), Present:false, Group:''},
+    {player_id:'3', First_Name:'Rashed', Last_Name:'Baghumyan', Rating:'1187', Last_Update:todayUS(), Present:true, Group:'B'},
+    {player_id:'4', First_Name:'Oguz', Last_Name:'Bakkal', Rating:'1371', Last_Update:todayUS(), Present:false, Group:''}
+  ];
+  hideAbsent=false; toggleBtn.textContent='Hide absent';
+  setStatus('Loaded sample','ok');
+  renderPlayers();
+});
+
+document.getElementById('clearAll').addEventListener('click', function(){ players=[]; hideAbsent=false; toggleBtn.textContent='Hide absent'; setStatus(''); renderPlayers(); });
+
+// initial render
+renderPlayers();
+
+// --- Display Groups ---
+
+function buildGroupsFragment(){
+  var groups={A:[],B:[],C:[],D:[]};
+  for(var i=0;i<players.length;i++){
+    var p=players[i];
+    if(!p || !p.Group || !groups.hasOwnProperty(p.Group)) continue;
+    if(!p.Present) continue;
+    var rating=Number(p.Rating||0);
+    groups[p.Group].push({name:(p.First_Name||'')+' '+(p.Last_Name||''),rating:rating});
+  }
+  var order=['A','B','C','D'];
+  var sections=[];
+  for(var gi=0;gi<order.length;gi++){
+    var g=order[gi],list=groups[g];
+    if(!list || !list.length) continue;
+    list.sort(function(a,b){return b.rating-a.rating;});
+    var rows=list.map(function(x){
+      return '<tr><td>'+escapeHtml(x.name)+'</td><td style="text-align:right">'+(x.rating||'')+'</td></tr>';
+    }).join('');
+    sections.push('<section style="margin:0 0 16px 0;page-break-inside:avoid">'+
+      '<h2 style="margin:0 0 6px 0;font-size:16px;">Group '+g+'</h2>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:14px">'+
+      '<thead><tr><th style="text-align:left;border-bottom:1px solid #333;padding:4px 0;">Player</th>'+
+      '<th style="text-align:right;border-bottom:1px solid #333;padding:4px 0;">Rating</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table></section>');
+  }
+  if(!sections.length){
+    return '<div class="hint">No groups to display yet. Assign players to A–D and mark them Present.</div>';
+  }
+  var when=new Date().toLocaleString();
+  return '<div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:#0b1224">'+
+         '<div style="color:var(--muted);font-size:13px;margin-bottom:8px">Generated '+escapeHtml(when)+'</div>'+
+         sections.join('')+'</div>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var displayBtn=document.getElementById('displayGroups');
+if(displayBtn){
+  displayBtn.addEventListener('click', function(){
+    var container=document.getElementById('groupsPreview');
+    if(!container) return;
+    container.innerHTML=buildGroupsFragment();
+    container.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+</script>
+</body>
+</html>
