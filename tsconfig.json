@@ -1,0 +1,20 @@
+{
+	"extends": "@tsconfig/node22/tsconfig.json",
+	"compilerOptions": {
+		"declaration": true,
+		"baseUrl": "./",
+		"outDir": "./dist",
+		"noErrorTruncation": true,
+		"verbatimModuleSyntax": true,
+		"module": "nodenext",
+		"moduleResolution": "nodenext"
+	},
+	"ts-node": {
+		"swc": true,
+		"transpileOnly": true
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"include": ["src"]
+}
