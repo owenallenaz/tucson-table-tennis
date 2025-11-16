@@ -7,7 +7,8 @@
 		"noErrorTruncation": true,
 		"verbatimModuleSyntax": true,
 		"module": "nodenext",
-		"moduleResolution": "nodenext"
+		"moduleResolution": "nodenext",
+		"noImplicitAny": false
 	},
 	"ts-node": {
 		"swc": true,
