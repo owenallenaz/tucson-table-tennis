@@ -17,6 +17,10 @@ export default function getVectorMatches(vector: PlayerVector): Match[] {
 			continue;
 		}
 
+		if (!playerA || !playerB) {
+			throw new Error("Invalid row");
+		}
+
 		result.push([playerA, playerB]);
 	}
 
