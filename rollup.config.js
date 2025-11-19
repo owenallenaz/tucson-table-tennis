@@ -17,7 +17,9 @@ const preventTreeShakingPlugin = () => {
 };
 
 export default {
-	input: "./src/appScript.ts",
+	input: [
+		"./src/appScript.ts"
+	],
 	output: {
 		dir: "dist",
 		format: "cjs",
@@ -28,6 +30,21 @@ export default {
 			extensions,
 			mainFields: ["jsnext:main", "main"],
 		}),
-		babel({ extensions, babelHelpers: "runtime" }),
+		babel({
+			extensions,
+			babelHelpers: "bundled",
+			babelrc: false,
+			presets: [
+				[
+					"@babel/preset-env",
+					{
+						"targets": {
+							"node": "current"
+						}
+					}
+				],
+				"@babel/preset-typescript"
+			]
+		}),
 	],
 };

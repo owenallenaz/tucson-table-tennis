@@ -3,7 +3,8 @@ import getSheetByName from "../getSheetByName.js";
 
 export default function getRoster() {
 	const sheet = getSheetByName("Roster");
-	const range = sheet.getRange("A2:D50").getValues();
+	const lastRow = sheet.getLastRow();
+	const range = sheet.getRange(`A2:D${lastRow}`).getValues();
 	const filtered = range.filter((val) => {
 		return val[0] !== "";
 	});

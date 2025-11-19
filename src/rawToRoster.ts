@@ -1,19 +1,27 @@
-import cleanValue from "./cleanValue.js";
+import cleanString from "./cleanString.js";
+import cleanNumber from "./cleanNumber.js";
+import type { RosterRow } from "./types.js";
 
-interface Player {
-	id: string
-	name: string
-	rating: string,
-	pool: string
-}
+export default function rawToRoster(raw: string[][]): RosterRow[] {
+	const roster: RosterRow[] = [];
 
-export default function rawToRoster(raw: string[][]) {
-	return raw.map(val => {
-		return {
-			id: cleanValue(val[0]),
-			name: cleanValue(val[1]),
-			rating: cleanValue(val[2]),
-			pool: cleanValue(val[3])
+	for (const val of raw) {
+		const id = cleanString(val[0]);
+		const name = cleanString(val[1]);
+		const rating = cleanNumber(val[2]);
+		const pool = cleanString(val[3]);
+
+		if (id === undefined || name === undefined || rating === undefined) {
+			continue;
 		}
-	});
+
+		roster.push({
+			id,
+			name,
+			rating,
+			pool
+		});
+	}
+
+	return roster;
 }

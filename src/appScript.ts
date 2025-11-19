@@ -5,9 +5,13 @@ import getRoster from "./methods/getRoster.js";
 import createMatchesFromRoster from "./methods/createMatchesFromRoster.js";
 import type { MethodHandler } from "./types.js";
 import setPool from "./methods/setPool.js";
+import calculateRatings from "./methods/calculateRatings.js";
+import addMatch from "./methods/addMatch.js";
 
 const methods = {
+	addMatch,
 	test: methodTest,
+	calculateRatings,
 	createMatchesFromRoster,
 	getRoster,
 	setPool
@@ -44,11 +48,23 @@ function test() {
 	// 	method: "createMatchesFromRoster",
 	// 	data: {}
 	// }
+	// const data = {
+	// 	method: "setPool",
+	// 	data: {
+	// 		pool: "C",
+	// 		id: "1"
+	// 	}
+	// }
+	// const data = {
+	// 	method: "calculateRatings"
+	// }
 	const data = {
-		method: "setPool",
+		method: "addMatch",
 		data: {
-			pool: "C",
-			id: "1"
+			idA: "1",
+			idB: "2",
+			aWins: 3,
+			bWins: 2
 		}
 	}
 

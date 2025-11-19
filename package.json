@@ -22,31 +22,11 @@
 		"tsx": "4.20.6",
 		"mocha": "11.7.1",
 		"rimraf": "6.1.0",
-		"rollup": "4.53.2"
+		"rollup": "4.53.2",
+		"usatt-ratings": "1.0.1"
 	},
 	"scripts": {
 		"build": "rimraf dist && rollup --config",
 		"test": "mocha --import=tsx  **/*.test.ts"
-	},
-	"babel": {
-		"presets": [
-			[
-				"@babel/preset-env",
-				{
-				"targets": {
-					"node": "current"
-				}
-				}
-			],
-			"@babel/preset-typescript"
-		],
-		"plugins": [
-			[
-				"@babel/plugin-transform-runtime",
-				{
-				"regenerator": true
-				}
-			]
-		]
 	}
 }
