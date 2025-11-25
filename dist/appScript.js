@@ -231,56 +231,55 @@ function getMap(players) {
 /** Process the point conversion from a winner USATT rating to a loser USATT rating */
 function calculatePoints(winner, loser) {
   const diff = winner - loser;
-  let points;
-  if (diff >= 0 && diff <= 12) {
-    points = 8;
-  } else if (diff >= 13 && diff <= 37) {
-    points = 7;
-  } else if (diff >= 38 && diff <= 62) {
-    points = 6;
-  } else if (diff >= 63 && diff <= 87) {
-    points = 5;
-  } else if (diff >= 88 && diff <= 112) {
-    points = 4;
-  } else if (diff >= 113 && diff <= 137) {
-    points = 3;
-  } else if (diff >= 138 && diff <= 187) {
-    points = 2;
-  } else if (diff >= 188 && diff <= 237) {
-    points = 1;
-  } else if (diff >= 287) {
-    points = 0;
-  }
-  if (points !== undefined) {
-    return points;
+  if (diff >= 0) {
+    if (diff >= 0 && diff <= 12) {
+      return 8;
+    } else if (diff >= 13 && diff <= 37) {
+      return 7;
+    } else if (diff >= 38 && diff <= 62) {
+      return 6;
+    } else if (diff >= 63 && diff <= 87) {
+      return 5;
+    } else if (diff >= 88 && diff <= 112) {
+      return 4;
+    } else if (diff >= 113 && diff <= 137) {
+      return 3;
+    } else if (diff >= 138 && diff <= 187) {
+      return 2;
+    } else if (diff >= 188 && diff <= 237) {
+      return 1;
+    } else if (diff >= 238) {
+      return 0;
+    } else {
+      throw new Error("Should never happen.");
+    }
   }
   const iDiff = Math.abs(diff);
   if (iDiff >= 0 && iDiff <= 12) {
-    points = 8;
+    return 8;
   } else if (iDiff >= 13 && iDiff <= 37) {
-    points = 10;
+    return 10;
   } else if (iDiff >= 38 && iDiff <= 62) {
-    points = 13;
+    return 13;
   } else if (iDiff >= 63 && iDiff <= 87) {
-    points = 16;
+    return 16;
   } else if (iDiff >= 88 && iDiff <= 112) {
-    points = 20;
+    return 20;
   } else if (iDiff >= 113 && iDiff <= 137) {
-    points = 25;
+    return 25;
   } else if (iDiff >= 138 && iDiff <= 162) {
-    points = 30;
+    return 30;
   } else if (iDiff >= 163 && iDiff <= 187) {
-    points = 35;
+    return 35;
   } else if (iDiff >= 188 && iDiff <= 212) {
-    points = 40;
+    return 40;
   } else if (iDiff >= 213 && iDiff <= 237) {
-    points = 45;
+    return 45;
   } else if (iDiff >= 238) {
-    points = 50;
+    return 50;
   } else {
     throw new Error("Should never happen.");
   }
-  return points;
 }
 
 /**
@@ -327,13 +326,14 @@ function advancedPass3(id, p1Rating, matches, ratingMap) {
   }
   if (hasLoss) {
     const opponentAverage = (bestWin + worstLoss) / 2;
-    return (p1Rating + opponentAverage) / 2;
+    return Math.floor((p1Rating + opponentAverage) / 2);
   } else {
-    return myMatches.reduce((prev, curr) => {
+    const total = myMatches.reduce((prev, curr) => {
       const loserRating = ratingMap.get(curr.loser);
       ok(loserRating);
       return prev + loserRating;
-    }, 0) / myMatches.length;
+    }, 0);
+    return Math.floor(total / myMatches.length);
   }
 }
 

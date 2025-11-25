@@ -23,7 +23,7 @@
 		"mocha": "11.7.1",
 		"rimraf": "6.1.0",
 		"rollup": "4.53.2",
-		"usatt-ratings": "1.0.1"
+		"usatt-ratings": "1.0.4"
 	},
 	"scripts": {
 		"build": "rimraf dist && rollup --config",
