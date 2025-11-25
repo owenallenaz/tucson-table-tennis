@@ -9,6 +9,7 @@
 	"workspaces": ["packages/appscript", "packages/web"],
 	"scripts": {
 		"appscript:build": "npm --workspace=packages/appscript run build",
-		"appscript:test": "npm --workspace=packages/appscript run test"
+		"appscript:test": "npm --workspace=packages/appscript run test",
+		"dev": "npm --workspace=packages/web run dev"
 	}
 }

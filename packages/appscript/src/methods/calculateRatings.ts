@@ -1,15 +1,11 @@
-import rawToMatches from "../rawToMatches.js";
 import getSheetByName from "../getSheetByName.js";
 import getRoster from "./getRoster.js";
 import { processTournament } from "usatt-ratings";
+import getMatches from "./getMatches.js";
 
 export default function calculateRatings() {
 	const roster = getRoster();
-	const sheet = getSheetByName("Matches");
-	const lastRow = sheet.getLastRow();
-
-	const values = sheet.getRange(`A2:E${lastRow}`).getValues();
-	const matchRows = rawToMatches(values);
+	const matchRows = getMatches();
 
 	const matches = matchRows.map(val => {
 		const winner = val.aWins > val.bWins ? val.idA : val.idB;

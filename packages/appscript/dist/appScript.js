@@ -189,28 +189,6 @@ function setPool(e, data) {
   throw new Error(`id '${data.id}' not found`);
 }
 
-function rawToMatches(raw) {
-  const rows = [];
-  for (const val of raw) {
-    const pool = cleanValue(val[0]);
-    const idA = cleanValue(val[1]);
-    const idB = cleanValue(val[2]);
-    const aWins = cleanNumber(val[3]);
-    const bWins = cleanNumber(val[4]);
-    if (pool === undefined || idA === undefined || idB === undefined || aWins === undefined || bWins === undefined) {
-      continue;
-    }
-    rows.push({
-      pool,
-      idA,
-      idB,
-      aWins,
-      bWins
-    });
-  }
-  return rows;
-}
-
 function ok(value) {
   if (value === undefined) {
     throw new Error("Received undefined value");
@@ -378,12 +356,39 @@ function processTournament(matches, players) {
   });
 }
 
-function calculateRatings() {
-  const roster = getRoster();
+function rawToMatches(raw) {
+  const rows = [];
+  for (const val of raw) {
+    const pool = cleanValue(val[0]);
+    const idA = cleanValue(val[1]);
+    const idB = cleanValue(val[2]);
+    const aWins = cleanNumber(val[3]);
+    const bWins = cleanNumber(val[4]);
+    if (pool === undefined || idA === undefined || idB === undefined || aWins === undefined || bWins === undefined) {
+      continue;
+    }
+    rows.push({
+      pool,
+      idA,
+      idB,
+      aWins,
+      bWins
+    });
+  }
+  return rows;
+}
+
+function getMatches() {
   const sheet = getSheetByName("Matches");
   const lastRow = sheet.getLastRow();
   const values = sheet.getRange(`A2:E${lastRow}`).getValues();
   const matchRows = rawToMatches(values);
+  return matchRows;
+}
+
+function calculateRatings() {
+  const roster = getRoster();
+  const matchRows = getMatches();
   const matches = matchRows.map(val => {
     const winner = val.aWins > val.bWins ? val.idA : val.idB;
     const loser = val.idA === winner ? val.idB : val.idA;
@@ -426,9 +431,23 @@ const methods = {
   calculateRatings,
   createMatchesFromRoster,
   getRoster,
+  getMatches,
   setPool
 };
-function doPost(e) {
+function doGet() {
+  return ContentService.createTextOutput("Must specify POST request.");
+}
+function errorWrap(method) {
+  return e => {
+    try {
+      return method(e);
+    } catch (e) {
+      return ContentService.createTextOutput(e.toString());
+    }
+  };
+}
+const doPost = errorWrap(_doPost);
+function _doPost(e) {
   const data = JSON.parse(e.postData.contents);
   if (!data.method) {
     throw new Error("Must pass JSON data and declare a method");
@@ -446,7 +465,9 @@ function doPost(e) {
     throw new Error(`Invalid authentication, user not authorized.`);
   }
   const result = method(e, data.data);
-  return ContentService.createTextOutput(JSON.stringify(result));
+  const response = ContentService.createTextOutput(JSON.stringify(result));
+  response.setMimeType(ContentService.MimeType.JSON);
+  return response;
 }
 function test() {
   // const data = {
@@ -463,14 +484,18 @@ function test() {
   // const data = {
   // 	method: "calculateRatings"
   // }
+  // const data = {
+  // 	method: "addMatch",
+  // 	data: {
+  // 		idA: "1",
+  // 		idB: "2",
+  // 		aWins: 3,
+  // 		bWins: 2
+  // 	}
+  // }
   const data = {
-    method: "addMatch",
-    data: {
-      idA: "1",
-      idB: "2",
-      aWins: 3,
-      bWins: 2
-    }
+    method: "getMatches",
+    data: {}
   };
   const signature = hmacSha256Base64(TOKEN, JSON.stringify(data));
   const result = doPost({

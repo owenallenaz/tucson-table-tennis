@@ -7,6 +7,7 @@ import type { MethodHandler } from "./types.js";
 import setPool from "./methods/setPool.js";
 import calculateRatings from "./methods/calculateRatings.js";
 import addMatch from "./methods/addMatch.js";
+import getMatches from "./methods/getMatches.js";
 
 const methods = {
 	addMatch,
@@ -14,10 +15,27 @@ const methods = {
 	calculateRatings,
 	createMatchesFromRoster,
 	getRoster,
+	getMatches,
 	setPool
 } satisfies Record<string, MethodHandler>
 
-function doPost(e: GoogleAppsScript.Events.DoPost) {
+function doGet() {
+	return ContentService.createTextOutput("Must specify POST request.");
+}
+
+function errorWrap(method) {
+	return (e: GoogleAppsScript.Events.DoPost) => {
+		try {
+			return method(e)
+		} catch (e: any) {
+			return ContentService.createTextOutput(e.toString());
+		}
+	}
+}
+
+const doPost = errorWrap(_doPost);
+
+function _doPost(e: GoogleAppsScript.Events.DoPost) {
 	const data = JSON.parse(e.postData.contents);
 	if (!data.method) {
 		throw new Error("Must pass JSON data and declare a method");
@@ -40,7 +58,9 @@ function doPost(e: GoogleAppsScript.Events.DoPost) {
 
 	const result = method(e, data.data);
 
-	return ContentService.createTextOutput(JSON.stringify(result));
+	const response = ContentService.createTextOutput(JSON.stringify(result));
+	response.setMimeType(ContentService.MimeType.JSON);
+	return response;
 }
 
 function test() {
@@ -58,14 +78,18 @@ function test() {
 	// const data = {
 	// 	method: "calculateRatings"
 	// }
+	// const data = {
+	// 	method: "addMatch",
+	// 	data: {
+	// 		idA: "1",
+	// 		idB: "2",
+	// 		aWins: 3,
+	// 		bWins: 2
+	// 	}
+	// }
 	const data = {
-		method: "addMatch",
-		data: {
-			idA: "1",
-			idB: "2",
-			aWins: 3,
-			bWins: 2
-		}
+		method: "getMatches",
+		data: {}
 	}
 
 	const signature = hmacSha256Base64(TOKEN, JSON.stringify(data));
