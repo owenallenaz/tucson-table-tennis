@@ -2,12 +2,19 @@ import getSheetByName from "../getSheetByName.js";
 import getRoster from "./getRoster.js";
 import { processTournament } from "usatt-ratings";
 import getMatches from "./getMatches.js";
+import type { MatchRow, MatchRowCompleted } from "src/types.js";
+
+function isComplete(matchRow: MatchRow): matchRow is MatchRowCompleted {
+	return matchRow.aWins !== undefined && matchRow.bWins !== undefined;
+}
 
 export default function calculateRatings() {
 	const roster = getRoster();
 	const matchRows = getMatches();
 
-	const matches = matchRows.map(val => {
+	const completedMatches: MatchRowCompleted[] = matchRows.filter(isComplete);
+
+	const matches = completedMatches.map(val => {
 		const winner = val.aWins > val.bWins ? val.idA : val.idB;
 		const loser = val.idA === winner ? val.idB : val.idA;
 		return {

@@ -16,8 +16,6 @@ export default function rawToMatches(raw: string[][]): MatchRow[] {
 			pool === undefined
 			|| idA === undefined
 			|| idB === undefined
-			|| aWins === undefined
-			|| bWins === undefined
 		) {
 			continue;
 		}

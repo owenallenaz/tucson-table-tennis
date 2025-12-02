@@ -1,25 +1,28 @@
-import Groups from "./Groups";
-import Roster from "./Roster";
-import useMatches from "./useMatches";
-import useRoster from "./useRoster";
+import { Route, Routes } from "react-router";
+import Home from "./Home";
+import Pool from "./Pool";
+import useAppData from "./useAppData";
+import Player from "./Player";
 
 export default function App() {
-	const players = useRoster();
-	const matches = useMatches();
-	console.log("matches", matches.data);
+	const appData = useAppData();
+
+	console.log("appData", appData);
 
 	return (
-		<main className="container">
-			<h1>Tucson Table Tennis Club</h1>
-			{
-				matches.isLoading && <p>Loading...</p>
-			}
-			{
-				!matches.isLoading && <Groups matches={matches.data}/>
-			}
-			{
-				!players.isLoading && <Roster players={players.data}/>
-			}
-		</main>
+		<>
+			<header>Tucson Table Tennis Club</header>
+			<main className="container" aria-busy={!appData.isLoaded}>
+				{
+					appData.isLoaded && (
+						<Routes>
+							<Route index element={<Home/>}/>
+							<Route path="/pools/:pool" element={<Pool/>}/>
+							<Route path="/players/:player" element={<Player/>}/>
+						</Routes>
+					)
+				}
+			</main>
+		</>
 	)
 }

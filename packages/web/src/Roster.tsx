@@ -1,15 +1,18 @@
-export default function Roster({ players }) {
+import type { RosterRow } from "@tttc/appscript/types";
+import { NavLink } from "react-router";
+
+export default function Roster({ players }: { players: RosterRow[] }) {
 	return (
-		<div>
+		<section>
 			<h3>Players</h3>
+			<hr/>
 			<ul>
 				{
 					players.map(val => {
-						console.log("val", val);
-						return <li>{val.name} - {val.rating} - {val.pool}</li>
+						return <li><NavLink to={`/players/${val.id}`}>{val.name}</NavLink> - {val.rating} - {val.pool}</li>
 					})
 				}
 			</ul>
-		</div>
+		</section>
 	)
 }

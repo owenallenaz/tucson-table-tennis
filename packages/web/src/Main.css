@@ -1,0 +1,21 @@
+.playerChip {
+
+}
+
+.playerChip .title {
+	padding-right: 4px;
+}
+
+
+.ratingChip {
+	font-size: 14px;
+}
+
+.vs {
+	padding: 0px 12px;
+}
+
+.ratingDelta {
+	font-size: 14px;
+	padding-left: 12px;
+}

@@ -21,7 +21,7 @@ export default {
 		"./src/appScript.ts"
 	],
 	output: {
-		dir: "dist",
+		dir: "dist_gas",
 		format: "cjs",
 	},
 	plugins: [

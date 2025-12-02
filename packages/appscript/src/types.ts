@@ -20,6 +20,8 @@ export interface MatchRow {
 	pool: string
 	idA: string
 	idB: string
-	aWins: number
-	bWins: number
+	aWins?: number
+	bWins?: number
 }
+
+export type MatchRowCompleted = Required<MatchRow>

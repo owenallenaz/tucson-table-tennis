@@ -1,0 +1,33 @@
+import getSheetByName from "../getSheetByName.js";
+import getRoster from "./getRoster.js";
+import { processTournament } from "usatt-ratings";
+import getMatches from "./getMatches.js";
+function isComplete(matchRow) {
+    return matchRow.aWins !== undefined && matchRow.bWins !== undefined;
+}
+export default function calculateRatings() {
+    const roster = getRoster();
+    const matchRows = getMatches();
+    const completedMatches = matchRows.filter(isComplete);
+    const matches = completedMatches.map(val => {
+        const winner = val.aWins > val.bWins ? val.idA : val.idB;
+        const loser = val.idA === winner ? val.idB : val.idA;
+        return {
+            winner,
+            loser
+        };
+    });
+    const result = processTournament(matches, roster);
+    const rosterSheet = getSheetByName("Roster");
+    const rosterLastRow = rosterSheet.getLastRow();
+    const ids = rosterSheet.getRange(`A2:A${rosterLastRow}`).getValues().flat().map(val => val.toString());
+    for (const row of result) {
+        const idIndex = ids.indexOf(row.id);
+        if (idIndex === -1) {
+            continue;
+        }
+        const rowNumber = idIndex + 2;
+        rosterSheet.getRange(`E${rowNumber}`).setValue(row.rating);
+        rosterSheet.getRange(`F${rowNumber}`).setValue(row.delta);
+    }
+}
