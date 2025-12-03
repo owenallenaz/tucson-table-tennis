@@ -10,16 +10,24 @@ export type Match = [string, string]
 export type MethodHandler = (e: GoogleAppsScript.Events.DoPost, data: any) => any
 
 export interface RosterRow {
+	row: number
 	id: string
 	name: string
 	rating: number
 	pool?: string
+	newRating?: number
+	delta?: number
+	playing: boolean
 }
 
 export interface MatchRow {
+	row: number
 	pool: string
 	idA: string
 	idB: string
+	completed: boolean
+	winner?: string
+	loser?: string
 	aWins?: number
 	bWins?: number
 }

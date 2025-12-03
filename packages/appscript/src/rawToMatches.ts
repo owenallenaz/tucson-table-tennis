@@ -5,12 +5,12 @@ import type { MatchRow } from "./types.js";
 export default function rawToMatches(raw: string[][]): MatchRow[] {
 	const rows: MatchRow[] = [];
 
-	for (const val of raw) {
+	for (const [i, val] of Object.entries(raw)) {
 		const pool = cleanString(val[0]);
 		const idA = cleanString(val[1]);
-		const idB = cleanString(val[2]);
-		const aWins = cleanNumber(val[3]);
-		const bWins = cleanNumber(val[4]);
+		const idB = cleanString(val[3]);
+		const aWins = cleanNumber(val[5]);
+		const bWins = cleanNumber(val[6]);
 
 		if (
 			pool === undefined
@@ -20,12 +20,24 @@ export default function rawToMatches(raw: string[][]): MatchRow[] {
 			continue;
 		}
 
+		const completed = aWins !== undefined && bWins !== undefined;
+		let winner: string | undefined;
+		let loser: string | undefined;
+		if (completed) {
+			winner = aWins > bWins ? idA : idB;
+			loser = winner === idA ? idB : idA;
+		}
+
 		rows.push({
+			row: Number(i) + 2,
 			pool,
 			idA,
 			idB,
 			aWins,
-			bWins
+			bWins,
+			completed,
+			winner,
+			loser
 		});
 	}
 

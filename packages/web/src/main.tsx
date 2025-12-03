@@ -6,6 +6,7 @@ import "./Main.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter } from "react-router";
 import { AppDataProvider } from './useAppData';
+import { AuthDataProvider } from './useAuth';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -22,9 +23,11 @@ createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
 			<HashRouter>
-				<AppDataProvider>
-					<App/>
-				</AppDataProvider>
+				<AuthDataProvider>
+					<AppDataProvider>
+						<App/>
+					</AppDataProvider>
+				</AuthDataProvider>
 			</HashRouter>
 		</QueryClientProvider>
 	</StrictMode>,

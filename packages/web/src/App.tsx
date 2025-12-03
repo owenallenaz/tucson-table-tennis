@@ -3,17 +3,33 @@ import Home from "./Home";
 import Pool from "./Pool";
 import useAppData from "./useAppData";
 import Player from "./Player";
+import useAuth from "./useAuth";
+import Login from "./Login";
+import RouteTree from "./RouteTree";
 
 export default function App() {
-	const appData = useAppData();
+	const auth = useAuth();
+	// const appData = useAppData();
 
-	console.log("appData", appData);
+	// console.log("appData", appData);
+	const logout = () => {
+		auth.logout();
+	}
+
 
 	return (
 		<>
-			<header>Tucson Table Tennis Club</header>
-			<main className="container" aria-busy={!appData.isLoaded}>
+			<header className="header">Tucson Table Tennis Club <button className="logout" onClick={logout}>Logout</button></header>
+			<main className="container">
 				{
+					auth?.token === undefined &&
+					<Login/>
+				}
+				{
+					auth?.token !== undefined &&
+					<RouteTree/>
+				}
+				{/* {
 					appData.isLoaded && (
 						<Routes>
 							<Route index element={<Home/>}/>
@@ -21,7 +37,7 @@ export default function App() {
 							<Route path="/players/:player" element={<Player/>}/>
 						</Routes>
 					)
-				}
+				} */}
 			</main>
 		</>
 	)

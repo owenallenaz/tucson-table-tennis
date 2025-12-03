@@ -1,10 +1,15 @@
 import getSheetByName from "../getSheetByName.js";
-import getRoster from "./getRoster.js";
 import calculateMatches from "../calculateMatches.js";
+import getRosterRows from "../getRosterRows.js";
+import { ADMIN_SHEET, MATCH_SHEET } from "../constants.js";
 
-export default function createMatchesFromRoster() {
-	const roster = getRoster();
-	const sheet = getSheetByName("Matches");
+export default function createMatchesFromRoster(e, data) {
+	if (data.tournament === undefined) {
+		throw new Error("Must specify tournament");
+	}
+
+	const roster = getRosterRows(data.tournament);
+	const sheet = getSheetByName(`${MATCH_SHEET}_${data.tournament}`);
 
 	const pools: Record<string, string[]> = {};
 	for (const player of roster) {
@@ -27,16 +32,18 @@ export default function createMatchesFromRoster() {
 	for (const [pool, ids] of Object.entries(pools)) {
 		const matches = calculateMatches(ids);
 		matches.forEach((val) => {
-			rawData.push([pool, val[0], val[1]]);
+			rawData.push([
+				pool,
+				val[0],
+				`=XLOOKUP(INDEX(B:B, ROW()), ${ADMIN_SHEET}!A:A, ${ADMIN_SHEET}!B:B)`,
+				val[1],
+				`=XLOOKUP(INDEX(D:D, ROW()), ${ADMIN_SHEET}!A:A, ${ADMIN_SHEET}!B:B)`,
+			]);
 		});
 	}
 
-	sheet.getRange("A2:E100").setValue("");
-	if (rawData.length === 0) {
-		return;
-	}
-
-	sheet.getRange(`A2:C${rawData.length + 1}`).setValues(rawData);
+	const lastRow = sheet.getLastRow();
+	sheet.getRange(`A${lastRow + 1}:E${lastRow + rawData.length}`).setValues(rawData);
 
 	return rawData;
 }
