@@ -1,1 +1,1 @@
-export default function getMatches(): import("../types.js").MatchRow[];
+export default function getMatches(e: any, data: any): import("../types.js").MatchRow[];

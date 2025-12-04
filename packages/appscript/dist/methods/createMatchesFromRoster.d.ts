@@ -1,1 +1,1 @@
-export default function createMatchesFromRoster(): string[][] | undefined;
+export default function createMatchesFromRoster(e: any, data: any): string[][];

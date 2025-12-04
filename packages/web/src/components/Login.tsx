@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import callGas from "./callGas";
-import useAuth from "./useAuth";
+import callGas from "#lib/callGas";
+import useAuth from "#hooks/useAuth";
 
 export default function Login() {
 	const { setToken } = useAuth();

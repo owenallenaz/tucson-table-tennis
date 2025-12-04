@@ -3,6 +3,7 @@
 	border-bottom: 1px solid #333;
 	display: flex;
 	justify-content: space-between;
+	margin-bottom: 1rem;
 }
 
 .logout {
@@ -10,14 +11,17 @@
 	padding: 4px 8px;
 }
 
-.playerChip {
-
+.playerChip .wins {
+	padding-right: 4px;
 }
 
 .playerChip .title {
 	padding-right: 4px;
 }
 
+.playerChip .delta {
+	padding-left: 4px;
+}
 
 .ratingChip {
 	font-size: 14px;
@@ -30,4 +34,16 @@
 .ratingDelta {
 	font-size: 14px;
 	padding-left: 12px;
+}
+
+.home .tournamentList[aria-busy="true"] {
+	text-align: left;
+}
+
+.loading[aria-busy="true"] {
+	display: inline-block;
+}
+
+.backButton {
+	margin-bottom: 1rem;
 }

@@ -1,3 +1,11 @@
 export declare const isNode: boolean;
 export declare const isAppsScript: boolean;
-export declare const TOKEN = "tttc";
+export declare const TOURNAMENTS_COLUMN = "E";
+export declare const TOKEN_CELL = "G2";
+export declare const ADMIN_SHEET = "Admin";
+export declare const MATCH_SHEET = "Matches";
+export declare const MATCH_A_WINS_CELL = "F";
+export declare const MATCH_B_WINS_CELL = "G";
+export declare const ROSTER_SHEET = "Roster";
+export declare const ROSTER_NEW_RATING_CELL = "E";
+export declare const ROSTER_DELTA_CELL = "F";

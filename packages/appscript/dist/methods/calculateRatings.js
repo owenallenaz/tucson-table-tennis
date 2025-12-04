@@ -1,33 +1,33 @@
 import getSheetByName from "../getSheetByName.js";
-import getRoster from "./getRoster.js";
 import { processTournament } from "usatt-ratings";
-import getMatches from "./getMatches.js";
+import getMatchRows from "../getMatchRows.js";
+import getRosterRows from "../getRosterRows.js";
+import { ROSTER_DELTA_CELL, ROSTER_NEW_RATING_CELL, ROSTER_SHEET } from "../constants.js";
 function isComplete(matchRow) {
-    return matchRow.aWins !== undefined && matchRow.bWins !== undefined;
+    return matchRow.completed;
 }
-export default function calculateRatings() {
-    const roster = getRoster();
-    const matchRows = getMatches();
+export default function calculateRatings(e, data) {
+    if (data.tournament === undefined) {
+        throw new Error("Must specify tournament");
+    }
+    const roster = getRosterRows(data.tournament);
+    const matchRows = getMatchRows(data.tournament);
     const completedMatches = matchRows.filter(isComplete);
     const matches = completedMatches.map(val => {
-        const winner = val.aWins > val.bWins ? val.idA : val.idB;
-        const loser = val.idA === winner ? val.idB : val.idA;
         return {
-            winner,
-            loser
+            winner: val.winner,
+            loser: val.loser
         };
     });
     const result = processTournament(matches, roster);
-    const rosterSheet = getSheetByName("Roster");
-    const rosterLastRow = rosterSheet.getLastRow();
-    const ids = rosterSheet.getRange(`A2:A${rosterLastRow}`).getValues().flat().map(val => val.toString());
+    const rosterSheet = getSheetByName(`${ROSTER_SHEET}_${data.tournament}`);
     for (const row of result) {
-        const idIndex = ids.indexOf(row.id);
-        if (idIndex === -1) {
+        const player = roster.find(val => val.id === row.id);
+        if (!player) {
             continue;
         }
-        const rowNumber = idIndex + 2;
-        rosterSheet.getRange(`E${rowNumber}`).setValue(row.rating);
-        rosterSheet.getRange(`F${rowNumber}`).setValue(row.delta);
+        const rowNumber = player.row;
+        rosterSheet.getRange(`${ROSTER_NEW_RATING_CELL}${rowNumber}`).setValue(row.rating);
+        rosterSheet.getRange(`${ROSTER_DELTA_CELL}${rowNumber}`).setValue(row.delta);
     }
 }

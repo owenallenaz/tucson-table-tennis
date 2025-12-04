@@ -9,7 +9,7 @@ export default function Roster({ players }: { players: RosterRow[] }) {
 			<ul>
 				{
 					players.map(val => {
-						return <li><NavLink to={`/players/${val.id}`}>{val.name}</NavLink> - {val.rating} - {val.pool}</li>
+						return <li><NavLink to={`players/${val.id}`}>{val.name}</NavLink> - {val.rating} - {val.pool}</li>
 					})
 				}
 			</ul>

@@ -1,9 +1,10 @@
 import { NavLink, useParams } from "react-router";
-import useAppData from "./useAppData";
 import MatchCard from "./MatchCard";
+import useTournamentData from "#hooks/useTournamentData";
+import BackButton from "./BackButton";
 
 export default function Pool() {
-	const { matches } = useAppData();
+	const { matches } = useTournamentData();
 	const { pool: poolName } = useParams();
 
 	const poolMatches = matches.filter(val => val.pool === poolName);
@@ -11,9 +12,9 @@ export default function Pool() {
 
 	return (
 		<div className="pool">
-			<NavLink to="/">Back</NavLink>
-			<h2>Pool - {poolName}</h2>
-			<h2>Matches</h2>
+			<BackButton to="../"/>
+			<h3>Pool - {poolName}</h3>
+			<h3>Matches</h3>
 			<hr/>
 			{
 				poolMatches.map((val, i) => {

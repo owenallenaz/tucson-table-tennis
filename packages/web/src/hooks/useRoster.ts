@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import callGas from "./callGas";
+import callGas from "#lib/callGas";
 import type { RosterRow } from "@tttc/appscript/types";
 
-export default function useRoster() {
+export default function useRoster(tournament: string) {
 	return useQuery<RosterRow[]>({
 		queryKey: ["roster"],
 		queryFn: async () => {
-			return callGas("getRoster", {});
+			return callGas("getRoster", { tournament });
 		}
 	});
 }

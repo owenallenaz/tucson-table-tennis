@@ -1,3 +1,11 @@
 export const isNode = typeof process !== "undefined" && !!(process.versions && process.versions.node);
 export const isAppsScript = typeof Utilities !== "undefined" && typeof Utilities.base64Encode === "function";
-export const TOKEN = "tttc";
+export const TOURNAMENTS_COLUMN = "E";
+export const TOKEN_CELL = "G2";
+export const ADMIN_SHEET = "Admin";
+export const MATCH_SHEET = "Matches";
+export const MATCH_A_WINS_CELL = "F";
+export const MATCH_B_WINS_CELL = "G";
+export const ROSTER_SHEET = "Roster";
+export const ROSTER_NEW_RATING_CELL = "E";
+export const ROSTER_DELTA_CELL = "F";

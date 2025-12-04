@@ -1,8 +1,8 @@
-import { APP_URL } from "./constants";
-import hmacSha256Base64 from "./hmacSha256Base64";
+import { APP_URL } from "../constants";
+import hmacSha256Base64 from "#lib/hmacSha256Base64";
 
 export default async function callGas(method: string, data: object) {
-   const content = {
+	const content = {
 		method,
 		data
 	}

@@ -1,1 +1,1 @@
-export default function getRoster(): import("../types.js").RosterRow[];
+export default function getRoster(e: any, data: any): import("../types.js").RosterRow[];

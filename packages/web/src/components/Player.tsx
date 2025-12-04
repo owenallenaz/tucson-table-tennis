@@ -1,10 +1,11 @@
-import { NavLink, useParams } from "react-router";
-import useAppData from "./useAppData";
+import { useParams } from "react-router";
 import MatchCard from "./MatchCard";
-import ok from "./ok";
+import ok from "#lib/ok";
+import useTournamentData from "#hooks/useTournamentData";
+import BackButton from "./BackButton";
 
 export default function Player() {
-	const { matches, playerIndex } = useAppData();
+	const { matches, playerIndex } = useTournamentData();
 	const { player: playerId } = useParams();
 	ok(playerId);
 
@@ -14,9 +15,9 @@ export default function Player() {
 
 	return (
 		<div className="pool">
-			<NavLink to="/">Back</NavLink>
-			<h2>Player - {player.name}</h2>
-			<h2>Matches</h2>
+			<BackButton to="../"/>
+			<h3>Player - {player.name}</h3>
+			<h3>Matches</h3>
 			<hr/>
 			{
 				poolMatches.map((val, i) => {

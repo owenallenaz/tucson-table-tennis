@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import callGas from "./callGas";
+import callGas from "#lib/callGas";
 import type { MatchRow } from "@tttc/appscript/types";
 
-export default function useMatches() {
+export default function useMatches(tournament: string) {
 	return useQuery<MatchRow[]>({
 		queryKey: ["matches"],
 		queryFn: async () => {
-			return callGas("getMatches", {});
+			return callGas("getMatches", { tournament });
 		}
 	});
 }

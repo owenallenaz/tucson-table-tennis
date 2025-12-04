@@ -1,10 +1,12 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import useMatches from "./useMatches";
-import useRoster from "./useRoster";
+import useMatches from "#hooks/useMatches";
+import useRoster from "#hooks/useRoster";
 import type { MatchRow, RosterRow } from "@tttc/appscript/types";
-import { EMPTY_MUTABLE_ARRAY } from "./constants";
+import { EMPTY_MUTABLE_ARRAY } from "../constants";
+import { useParams } from "react-router";
+import ok from "#lib/ok";
 
-interface AppContextData {
+interface TournamentContextData {
 	matches: MatchRow[]
 	roster: RosterRow[]
 	pools: string[]
@@ -15,7 +17,7 @@ interface AppContextData {
 
 type PlayerIndex = Map<string, RosterRow>
 
-export const AppContext = createContext<AppContextData>({
+export const TournamentContext = createContext<TournamentContextData>({
 	matches: [],
 	roster: [],
 	pools: [],
@@ -24,10 +26,13 @@ export const AppContext = createContext<AppContextData>({
 	playerIndex: new Map()
 });
 
-export function AppDataProvider({ children }: { children: ReactNode }) {
-	const matches = useMatches();
+export function TournamentDataProvider({ children }: { children: ReactNode }) {
+	const { tournament } = useParams();
+	ok(tournament);
+
+	const matches = useMatches(tournament);
 	const matchData = matches.data ?? EMPTY_MUTABLE_ARRAY;
-	const roster = useRoster();
+	const roster = useRoster(tournament);
 	const rosterData = roster.data ?? EMPTY_MUTABLE_ARRAY;
 	const isLoaded = matches.isFetched && roster.isFetched;
 	const isFetching = matches.isFetching && roster.isFetching;
@@ -70,13 +75,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 	]);
 
 	return (
-		<AppContext value={contextData}>
+		<TournamentContext value={contextData}>
 			{children}
-		</AppContext>
+		</TournamentContext>
 	)
 }
 
-export default function useAppData() {
-	const contextData = useContext(AppContext);
+export default function useTournamentData() {
+	const contextData = useContext(TournamentContext);
 	return contextData;
 }
