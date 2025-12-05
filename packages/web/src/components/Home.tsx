@@ -15,7 +15,7 @@ export default function Home() {
 					<ul>
 						{
 							tournamentQuery.data.map(val => {
-								return <li><NavLink to={`/tournament/${val}`}>{val}</NavLink></li>
+								return <li key={val}><NavLink to={`/tournament/${val}`}>{val}</NavLink></li>
 							})
 						}
 					</ul>

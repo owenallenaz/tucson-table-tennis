@@ -13,8 +13,8 @@ export default function MatchForm({
 	match: MatchRow
 	onClose: () => void
 }) {
-	const queryClient = useQueryClient();
-	const { tournament } = useTournamentData();
+	// const queryClient = useQueryClient();
+	const { tournament, reloadMatches } = useTournamentData();
 	const players = useMatchPlayers(match);
 	const [firstWins, setFirstWins] = useState(players.firstWins ?? "");
 	const [secondWins, setSecondWins] = useState(players.secondWins ?? "");
@@ -40,7 +40,7 @@ export default function MatchForm({
 			bWins
 		});
 
-		await queryClient.invalidateQueries({ queryKey: ["matches"] });
+		await reloadMatches();
 
 		setProcessing(false);
 		onClose();

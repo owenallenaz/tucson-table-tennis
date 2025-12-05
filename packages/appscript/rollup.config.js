@@ -16,7 +16,7 @@ const preventTreeShakingPlugin = () => {
 	};
 };
 
-export default {
+const appScript = {
 	input: [
 		"./src/appScript.ts"
 	],
@@ -47,4 +47,39 @@ export default {
 			]
 		}),
 	],
-};
+}
+
+const cfWorker = {
+	input: [
+		"./src/cfWorker.ts"
+	],
+	output: {
+		dir: "dist_cf",
+		format: "esm",
+	},
+	plugins: [
+		preventTreeShakingPlugin(),
+		nodeResolve({
+			extensions,
+			mainFields: ["jsnext:main", "main"],
+		}),
+		babel({
+			extensions,
+			babelHelpers: "bundled",
+			babelrc: false,
+			presets: [
+				[
+					"@babel/preset-env",
+					{
+						"targets": {
+							"node": "current"
+						}
+					}
+				],
+				"@babel/preset-typescript"
+			]
+		}),
+	],
+}
+
+export default [appScript, cfWorker];

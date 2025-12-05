@@ -2,6 +2,7 @@ export const isNode = typeof process !== "undefined" && !!(process.versions && p
 export const isAppsScript = typeof Utilities !== "undefined" && typeof Utilities.base64Encode === "function";
 export const TOURNAMENTS_COLUMN = "E";
 export const TOKEN_CELL = "G2";
+export const TOKEN_CELL_ADMIN = "H2";
 export const ADMIN_SHEET = "Admin";
 export const MATCH_SHEET = "Matches";
 export const MATCH_A_WINS_CELL = "F";

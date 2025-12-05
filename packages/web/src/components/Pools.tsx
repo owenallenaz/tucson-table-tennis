@@ -8,7 +8,7 @@ export default function Pools({ pools }: { pools: string[] }) {
 			{
 				pools.map(val => {
 					return (
-						<article>
+						<article key={val}>
 							<div className="pool" key={val}><NavLink to={`pools/${val}`}>{val}</NavLink></div>
 						</article>
 					)

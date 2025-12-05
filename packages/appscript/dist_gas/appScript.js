@@ -4,6 +4,7 @@ const isNode = typeof process !== "undefined" && !!(process.versions && process.
 const isAppsScript = typeof Utilities !== "undefined" && typeof Utilities.base64Encode === "function";
 const TOURNAMENTS_COLUMN = "E";
 const TOKEN_CELL = "G2";
+const TOKEN_CELL_ADMIN = "H2";
 const ADMIN_SHEET = "Admin";
 const MATCH_SHEET = "Matches";
 const MATCH_A_WINS_CELL = "F";
@@ -423,6 +424,9 @@ function rawToMatches(raw) {
 function getMatchRows(tournament) {
   const sheet = getSheetByName(`${MATCH_SHEET}_${tournament}`);
   const lastRow = sheet.getLastRow();
+  if (lastRow === 1) {
+    return [];
+  }
   const values = sheet.getRange(`A2:G${lastRow}`).getValues();
   const matchRows = rawToMatches(values);
   return matchRows;
@@ -477,10 +481,14 @@ function getMatches(e, data) {
   return getMatchRows(data.tournament);
 }
 
-function getToken() {
+function getTokens() {
   const sheet = getSheetByName(ADMIN_SHEET);
   const token = sheet.getRange(TOKEN_CELL).getValue();
-  return token;
+  const adminToken = sheet.getRange(TOKEN_CELL_ADMIN).getValue();
+  return {
+    token,
+    adminToken
+  };
 }
 
 function getTournaments() {
@@ -490,9 +498,14 @@ function getTournaments() {
 }
 
 function checkToken(e, data) {
-  const token = getToken();
+  const {
+    token,
+    adminToken
+  } = getTokens();
+  const type = data.token === token ? "primary" : data.token === adminToken ? "admin" : undefined;
   return {
-    success: token === data.token
+    success: type !== undefined,
+    type
   };
 }
 
@@ -546,10 +559,15 @@ function _doPost(e) {
     method: data.method,
     data: data.data
   };
-  const token = getToken();
+  const {
+    token,
+    adminToken
+  } = getTokens();
   if (data.method !== "checkToken") {
-    const expectedSig = hmacSha256Base64(token, JSON.stringify(packet));
-    if (expectedSig !== data.signature) {
+    const jsonString = JSON.stringify(packet);
+    const primarySig = hmacSha256Base64(token, jsonString);
+    const adminSig = hmacSha256Base64(adminToken, jsonString);
+    if (primarySig !== data.signature && adminSig !== data.signature) {
       throw new Error(`Invalid authentication, user not authorized.`);
     }
   }
@@ -605,12 +623,6 @@ function test() {
   // 		tournament: "2025_11_15"
   // 	}
   // }
-  // const data = {
-  // 	method: "checkToken",
-  // 	data: {
-  // 		token: "tttc"
-  // 	}
-  // }
   const data = {
     method: "updateMatch",
     data: {
@@ -620,7 +632,9 @@ function test() {
       bWins: 0
     }
   };
-  const token = getToken();
+  const {
+    token
+  } = getTokens();
   const signature = hmacSha256Base64(token, JSON.stringify(data));
   const result = doPost({
     postData: {

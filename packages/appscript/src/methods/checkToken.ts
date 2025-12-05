@@ -1,7 +1,16 @@
-import getToken from "../getToken.js";
+import getTokens from "../getTokens.js";
 
 export default function checkToken(e, data) {
-	const token = getToken();
+	const { token, adminToken } = getTokens();
+	const type = data.token === token
+		? "primary"
+		: data.token === adminToken
+			? "admin"
+		: undefined
+	;
 
-	return { success: token === data.token };
+	return {
+		success: type !== undefined,
+		type
+	};
 }

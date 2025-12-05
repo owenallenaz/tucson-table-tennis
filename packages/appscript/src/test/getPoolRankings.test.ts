@@ -17,7 +17,7 @@ function getMatch(row, idA, aWins, idB, bWins) {
 	}
 }
 
-describe.only(__filename, function() {
+describe(__filename, function() {
 	interface Test {
 		matches: MatchRowCompleted[]
 		result: string[]

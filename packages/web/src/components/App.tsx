@@ -9,6 +9,7 @@ import Tournament from "./Tournament";
 
 export default function App() {
 	const auth = useAuth();
+	console.log("auth", auth);
 
 	return (
 		<>
@@ -16,7 +17,10 @@ export default function App() {
 				<span>Tucson Table Tennis Club</span>
 				{
 					auth?.token !== undefined &&
-					<button className="logout" onClick={auth.logout}>Logout</button>
+					<span>
+						<span className="userType">({auth.type})</span>
+						<button className="logout" onClick={auth.logout}>Logout</button>
+					</span>
 				}
 			</header>
 			<main className="container">

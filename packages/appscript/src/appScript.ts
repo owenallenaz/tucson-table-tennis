@@ -7,7 +7,7 @@ import setPool from "./methods/setPool.js";
 import calculateRatings from "./methods/calculateRatings.js";
 import addMatch from "./methods/addMatch.js";
 import getMatches from "./methods/getMatches.js";
-import getToken from "./getToken.js";
+import getTokens from "./getTokens.js";
 import getTournaments from "./methods/getTournaments.js";
 import checkToken from "./methods/checkToken.js";
 import updateMatch from "./methods/updateMatch.js";
@@ -57,11 +57,13 @@ function _doPost(e: GoogleAppsScript.Events.DoPost) {
 		data: data.data
 	}
 
-	const token = getToken();
+	const { token, adminToken } = getTokens();
 
 	if (data.method !== "checkToken") {
-		const expectedSig = hmacSha256Base64(token, JSON.stringify(packet));
-		if (expectedSig !== data.signature) {
+		const jsonString = JSON.stringify(packet);
+		const primarySig = hmacSha256Base64(token, jsonString);
+		const adminSig = hmacSha256Base64(adminToken, jsonString);
+		if (primarySig !== data.signature && adminSig !== data.signature) {
 			throw new Error(`Invalid authentication, user not authorized.`);
 		}
 	}
@@ -120,12 +122,6 @@ function test() {
 	// 		tournament: "2025_11_15"
 	// 	}
 	// }
-	// const data = {
-	// 	method: "checkToken",
-	// 	data: {
-	// 		token: "tttc"
-	// 	}
-	// }
 	const data = {
 		method: "updateMatch",
 		data: {
@@ -136,7 +132,7 @@ function test() {
 		}
 	}
 
-	const token = getToken();
+	const { token } = getTokens();
 	const signature = hmacSha256Base64(token, JSON.stringify(data));
 
 	const result = doPost({

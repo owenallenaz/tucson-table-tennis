@@ -3,7 +3,7 @@ import callGas from "#lib/callGas";
 import useAuth from "#hooks/useAuth";
 
 export default function Login() {
-	const { setToken } = useAuth();
+	const { setToken, setType } = useAuth();
 	const [password, setPassword] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,6 +18,7 @@ export default function Login() {
 		}
 
 		setToken(password);
+		setType(result.type);
 	}
 
 	return (

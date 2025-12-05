@@ -3,10 +3,25 @@ import Loading from "./Loading";
 import Pools from "./Pools";
 import Roster from "./Roster";
 import BackButton from "./BackButton";
+import useAuth from "#hooks/useAuth";
+import Button from "./Button";
+import { useState } from "react";
+import callGas from "#lib/callGas";
 
 export default function Tournament() {
+	const [isCreatingMatches, setIsCreatingMatches] = useState<boolean>(false);
+	const auth = useAuth();
 	const data = useTournamentData();
-	console.log("data", data.isLoaded, data.isFetching, data.pools, data.roster);
+
+	const createMatches = async () => {
+		setIsCreatingMatches(true);
+		await callGas("createMatchesFromRoster", {
+			tournament: data.tournament
+		});
+		setIsCreatingMatches(false);
+	}
+
+	console.log("data", data);
 
 	return (
 		<div className="tournament">
@@ -17,6 +32,14 @@ export default function Tournament() {
 			}
 			{
 				data.isLoaded && data.roster.length > 0 && <Roster players={data.roster}/>
+			}
+			{
+				auth.type === "admin" &&
+				<>
+					<h3>Admin</h3>
+					<hr/>
+					<Button onClick={createMatches} busy={isCreatingMatches}>Create Matches</Button>
+				</>
 			}
 		</div>
 	)
