@@ -7,9 +7,13 @@
 		"url": "https://github.com/owenallenaz"
 	},
 	"workspaces": ["packages/appscript", "packages/web"],
+	"devDependencies": {
+		"rimraf": "6.1.0"
+	},
 	"scripts": {
 		"appscript:build": "npm --workspace=packages/appscript run build",
 		"appscript:test": "npm --workspace=packages/appscript run test",
-		"dev": "npm --workspace=packages/web run dev"
+		"dev": "npm --workspace=packages/web run dev",
+		"web:build": "rimraf docs && npm --workspace=packages/web run build && mkdir docs && xcopy packages\\web\\dist docs\\ /s /y"
 	}
 }
