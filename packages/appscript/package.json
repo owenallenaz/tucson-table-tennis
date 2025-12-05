@@ -26,7 +26,8 @@
 		"usatt-ratings": "1.0.4"
 	},
 	"exports": {
-		"./types": "./dist/types.d.ts"
+		"./types": "./dist/types.d.ts",
+		"./lib/*": "./dist/*.js"
 	},
 	"scripts": {
 		"build": "rimraf dist_gas && rollup --config",

@@ -8,11 +8,17 @@
 
 .logout {
 	font-size: 12px;
-	padding: 4px 8px;
+	padding: 4px 12px;
 }
 
 .playerChip .wins {
 	padding-right: 4px;
+}
+
+.playerChip .checkmark {
+	color: #47ff47;
+	padding-right: 4px;
+	font-weight: bold;
 }
 
 .playerChip .title {
@@ -46,4 +52,32 @@
 
 .backButton {
 	margin-bottom: 1rem;
+}
+
+.editMatchButton {
+	padding: 4px 12px;
+	font-size: 12px;
+}
+
+.defaultButton.small {
+	padding: 4px 12px;
+	font-size: 12px;
+}
+
+.defaultButton.large {
+	font-size: 20px;
+	padding: 6px 20px;
+}
+
+.dialogHeader {
+	margin-bottom: 1rem;
+}
+
+.matchValidationError {
+	color: rgb(255, 63, 63);
+}
+
+.poolRecord {
+	font-size: 14px;
+	padding-left: 4px;
 }

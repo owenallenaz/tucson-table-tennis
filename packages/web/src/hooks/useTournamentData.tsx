@@ -7,6 +7,7 @@ import { useParams } from "react-router";
 import ok from "#lib/ok";
 
 interface TournamentContextData {
+	tournament: string
 	matches: MatchRow[]
 	roster: RosterRow[]
 	pools: string[]
@@ -17,14 +18,7 @@ interface TournamentContextData {
 
 type PlayerIndex = Map<string, RosterRow>
 
-export const TournamentContext = createContext<TournamentContextData>({
-	matches: [],
-	roster: [],
-	pools: [],
-	isLoaded: false,
-	isFetching: false,
-	playerIndex: new Map()
-});
+export const TournamentContext = createContext<TournamentContextData | null>(null);
 
 export function TournamentDataProvider({ children }: { children: ReactNode }) {
 	const { tournament } = useParams();
@@ -58,6 +52,7 @@ export function TournamentDataProvider({ children }: { children: ReactNode }) {
 
 	const contextData = useMemo(() => {
 		return {
+			tournament,
 			matches: matchData,
 			roster: rosterData,
 			pools,
@@ -66,6 +61,7 @@ export function TournamentDataProvider({ children }: { children: ReactNode }) {
 			playerIndex
 		}
 	}, [
+		tournament,
 		matchData,
 		rosterData,
 		isLoaded,
@@ -83,5 +79,7 @@ export function TournamentDataProvider({ children }: { children: ReactNode }) {
 
 export default function useTournamentData() {
 	const contextData = useContext(TournamentContext);
+	ok(contextData);
+
 	return contextData;
 }

@@ -33,3 +33,13 @@ export interface MatchRow {
 }
 
 export type MatchRowCompleted = Required<MatchRow>
+
+export interface PlayerStats {
+	id: string
+	matchWins: number
+	matchLosses: number
+	gameWins: number
+	gameLosses: number
+}
+
+export type PlayerStatsMap = Map<string, PlayerStats>

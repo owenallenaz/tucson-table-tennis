@@ -4,5 +4,7 @@ interface UpdateMatchArgs {
     aWins: number;
     bWins: number;
 }
-export default function updateMatch(e: any, data: UpdateMatchArgs): void;
+export default function updateMatch(e: any, data: UpdateMatchArgs): {
+    success: boolean;
+};
 export {};

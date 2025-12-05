@@ -7,4 +7,7 @@ export default function updateMatch(e, data) {
     const sheet = getSheetByName(`${MATCH_SHEET}_${data.tournament}`);
     sheet.getRange(`${MATCH_A_WINS_CELL}${data.row}`).setValue(data.aWins);
     sheet.getRange(`${MATCH_B_WINS_CELL}${data.row}`).setValue(data.bWins);
+    return {
+        success: true
+    };
 }

@@ -1,47 +1,45 @@
 import type { MatchRow } from "@tttc/appscript/types";
 import PlayerChip from "./PlayerChip";
-import ok from "#lib/ok";
-import useTournamentData from "#hooks/useTournamentData";
-import MatchScore from "./MatchScore";
-import isMatchRowCompleted from "#lib/isMatchRowCompleted";
 import useMatchPlayers from "#hooks/useMatchPlayers";
-import { calculatePoints } from "usatt-ratings";
+import { useState } from "react";
+import Button from "./Button";
+import MatchForm from "./MatchForm";
 
 export default function MatchCard({ match }: { match: MatchRow }) {
-	// const tournamentData = useTournamentData();
+	const [showDialog, setShowDialog] = useState(false);
 	const players = useMatchPlayers(match);
-	// const playerA = tournamentData.playerIndex.get(match.idA);
-	// ok(playerA);
-	// const playerB = tournamentData.playerIndex.get(match.idB);
-	// ok(playerB);
 
-	// const first = playerA.rating >= playerB.rating ? playerA.id : playerB.id;
-	// const second = playerA.rating >= playerB.rating ? playerB.id : playerA.id;
+	const onClose = function() {
+		setShowDialog(false);
+	}
 
-	let delta: number | undefined;
-	let firstWins: number | undefined;
-	let secondWins: number | undefined;
-	let firstDelta: string | undefined;
-	let secondDelta: string | undefined;
-	if (match.completed) {
-		delta = calculatePoints(players.winner.rating, players.loser.rating);
-		firstWins = players.first.id === match.idA ? match.aWins : match.bWins;
-		secondWins = players.first.id === match.idA ? match.bWins : match.aWins;
-		firstDelta = players.winner === players.first ? `+${delta}` : `-${delta}`;
-		secondDelta = players.winner === players.first ? `-${delta}` : `+${delta}`;
+	const onEdit = function() {
+		setShowDialog(true);
 	}
 
 	return (
 		<article>
 			<div>
-				<PlayerChip id={players.first.id} wins={firstWins} delta={firstDelta}/>
+				<PlayerChip id={players.first.id} wins={players.firstWins} delta={players.firstDelta} winner={players.first.id === match.winner}/>
 				<span className="vs">vs</span>
-				<PlayerChip id={players.second.id} wins={secondWins} delta={secondDelta}/>
+				<PlayerChip id={players.second.id} wins={players.secondWins} delta={players.secondDelta} winner={players.second.id === match.winner}/>
 			</div>
-			{/* {
-				isMatchRowCompleted(match) &&
-				<MatchScore first={first} second={second} match={match}/>
-			} */}
+			<div>
+				<Button onClick={onEdit}>Edit</Button>
+			</div>
+			<dialog open={showDialog}>
+				<article>
+					<div className="dialogHeader">
+						<Button onClick={onClose} className="outline contrast">Close</Button>
+					</div>
+					<div>
+						<MatchForm
+							match={match}
+							onClose={onClose}
+						/>
+					</div>
+				</article>
+			</dialog>
 		</article>
 	)
 }

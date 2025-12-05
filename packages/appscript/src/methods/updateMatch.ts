@@ -17,4 +17,8 @@ export default function updateMatch(e, data: UpdateMatchArgs) {
 
 	sheet.getRange(`${MATCH_A_WINS_CELL}${data.row}`).setValue(data.aWins);
 	sheet.getRange(`${MATCH_B_WINS_CELL}${data.row}`).setValue(data.bWins);
+
+	return {
+		success: true
+	}
 }
