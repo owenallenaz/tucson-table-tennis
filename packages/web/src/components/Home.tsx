@@ -1,14 +1,9 @@
-import Pools from "./Pools";
-import Roster from "./Roster";
-// import useAppData from "./useAppData";
 import useTournaments from "#hooks/useTournaments";
 import { NavLink } from "react-router";
 import Loading from "./Loading";
 
 export default function Home() {
-	// const appData = useAppData();
 	const tournamentQuery = useTournaments();
-	console.log("tournamentQuery", tournamentQuery, tournamentQuery.data);
 
 	return (
 		<div className="home">
