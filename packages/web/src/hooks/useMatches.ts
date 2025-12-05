@@ -5,6 +5,7 @@ import type { MatchRow } from "@tttc/appscript/types";
 export default function useMatches(tournament: string) {
 	return useQuery<MatchRow[]>({
 		queryKey: ["matches"],
+		refetchOnWindowFocus: true,
 		queryFn: async () => {
 			return callGas("getMatches", { tournament });
 		}

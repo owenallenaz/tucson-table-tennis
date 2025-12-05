@@ -28,7 +28,7 @@ export default function Login() {
 					name="password"
 					placeholder="Password"
 					value={password}
-					onChange={(e) => setPassword(e.currentTarget.value)}
+					onChange={(e) => setPassword(e.currentTarget.value.toLowerCase())}
 				/>
 				<button aria-busy={loading} onClick={onSubmit}>Login</button>
 			</fieldset>

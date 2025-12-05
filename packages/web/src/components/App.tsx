@@ -12,7 +12,13 @@ export default function App() {
 
 	return (
 		<>
-			<header className="header">Tucson Table Tennis Club <button className="logout" onClick={auth.logout}>Logout</button></header>
+			<header className="header">
+				<span>Tucson Table Tennis Club</span>
+				{
+					auth?.token !== undefined &&
+					<button className="logout" onClick={auth.logout}>Logout</button>
+				}
+			</header>
 			<main className="container">
 				{
 					auth?.token === undefined &&

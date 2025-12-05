@@ -14,6 +14,8 @@ interface TournamentContextData {
 	playerIndex: PlayerIndex
 	isLoaded: boolean
 	isFetching: boolean
+	isFetchingMatches: boolean
+	reloadMatches: () => any
 }
 
 type PlayerIndex = Map<string, RosterRow>
@@ -30,6 +32,7 @@ export function TournamentDataProvider({ children }: { children: ReactNode }) {
 	const rosterData = roster.data ?? EMPTY_MUTABLE_ARRAY;
 	const isLoaded = matches.isFetched && roster.isFetched;
 	const isFetching = matches.isFetching && roster.isFetching;
+	const isFetchingMatches = matches.isFetching;
 
 	const playerIndex = useMemo(() => {
 		const map = new Map<string, RosterRow>();
@@ -50,22 +53,28 @@ export function TournamentDataProvider({ children }: { children: ReactNode }) {
 		return [...set];
 	}, [matchData]);
 
-	const contextData = useMemo(() => {
+	const reloadMatches = matches.refetch;
+
+	const contextData: TournamentContextData = useMemo(() => {
 		return {
 			tournament,
 			matches: matchData,
+			reloadMatches,
 			roster: rosterData,
 			pools,
 			isLoaded,
 			isFetching,
+			isFetchingMatches,
 			playerIndex
 		}
 	}, [
 		tournament,
 		matchData,
+		reloadMatches,
 		rosterData,
 		isLoaded,
 		isFetching,
+		isFetchingMatches,
 		pools,
 		playerIndex
 	]);

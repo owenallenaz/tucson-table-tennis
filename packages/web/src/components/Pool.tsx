@@ -4,9 +4,10 @@ import useTournamentData from "#hooks/useTournamentData";
 import BackButton from "./BackButton";
 import Loading from "./Loading";
 import PoolPlayers from "./PoolPlayers";
+import Button from "./Button";
 
 export default function Pool() {
-	const { matches, isFetching } = useTournamentData();
+	const { matches, isFetching, isFetchingMatches, reloadMatches } = useTournamentData();
 	const { pool: poolName } = useParams();
 
 	const poolMatches = matches.filter(val => val.pool === poolName);
@@ -19,6 +20,8 @@ export default function Pool() {
 				!isFetching &&
 				<div>
 					<h3>Pool - {poolName}</h3>
+					<Button onClick={reloadMatches} busy={isFetchingMatches}>Reload Data</Button>
+					<hr/>
 					<h3>Players</h3>
 					<hr/>
 					<PoolPlayers matches={poolMatches}/>
