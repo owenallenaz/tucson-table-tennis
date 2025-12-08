@@ -1,3 +1,3 @@
-export default function cleanNumber(str: string): number | undefined {
-	return str === "" ? undefined : Number(str);
+export default function cleanNumber(str: string | undefined): number | undefined {
+	return str === "" || str === undefined ? undefined : Number(str);
 }

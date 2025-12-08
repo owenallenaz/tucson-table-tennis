@@ -1,10 +1,11 @@
 import type { MatchRow } from "@tttc/appscript/types";
 import { useState, type FormEvent } from "react";
 import Button from "./Button";
-import callGas from "#lib/callGas";
 import useMatchPlayers from "#hooks/useMatchPlayers";
 import useTournamentData from "#hooks/useTournamentData";
-import { useQueryClient } from "@tanstack/react-query";
+import callCf from "#lib/callCf";
+import useAuth from "#hooks/useAuth";
+import ok from "#lib/ok";
 
 export default function MatchForm({
 	match,
@@ -13,7 +14,8 @@ export default function MatchForm({
 	match: MatchRow
 	onClose: () => void
 }) {
-	// const queryClient = useQueryClient();
+	const { token } = useAuth();
+	ok(token);
 	const { tournament, reloadMatches } = useTournamentData();
 	const players = useMatchPlayers(match);
 	const [firstWins, setFirstWins] = useState(players.firstWins ?? "");
@@ -33,7 +35,7 @@ export default function MatchForm({
 		const aWins = players.first === players.playerA ? firstWinsInt : secondWinsInt;
 		const bWins = players.first === players.playerA ? secondWinsInt : firstWinsInt;
 
-		await callGas("updateMatch", {
+		await callCf(token, "updateMatch", {
 			tournament,
 			row: match.row,
 			aWins,

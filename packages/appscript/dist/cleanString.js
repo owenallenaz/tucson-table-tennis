@@ -1,3 +1,3 @@
 export default function cleanValue(str) {
-    return str === "" ? undefined : str.toString();
+    return str === "" || str === undefined ? undefined : str.toString();
 }

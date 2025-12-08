@@ -11,7 +11,7 @@ export default function Login() {
 		e.preventDefault();
 
 		setLoading(true);
-		const result = await callGas("checkToken", { token: password });
+		const result = await callGas(password, "checkToken", { token: password });
 		setLoading(false);
 		if (result.success !== true) {
 			return alert("Invalid password");

@@ -13,6 +13,12 @@ export default function calculateRatings(e, data) {
     const roster = getRosterRows(data.tournament);
     const matchRows = getMatchRows(data.tournament);
     const completedMatches = matchRows.filter(isComplete);
+    if (matchRows.length !== completedMatches.length) {
+        return {
+            success: false,
+            message: "All matches must be completed."
+        };
+    }
     const matches = completedMatches.map(val => {
         return {
             winner: val.winner,
@@ -30,4 +36,7 @@ export default function calculateRatings(e, data) {
         rosterSheet.getRange(`${ROSTER_NEW_RATING_CELL}${rowNumber}`).setValue(row.rating);
         rosterSheet.getRange(`${ROSTER_DELTA_CELL}${rowNumber}`).setValue(row.delta);
     }
+    return {
+        success: true
+    };
 }

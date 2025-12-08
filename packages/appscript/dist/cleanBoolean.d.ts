@@ -1,1 +1,1 @@
-export default function cleanBoolean(str: string): boolean;
+export default function cleanBoolean(str: string | undefined): boolean;

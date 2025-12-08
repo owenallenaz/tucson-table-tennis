@@ -34,7 +34,11 @@
 }
 
 .vs {
-	padding: 0px 12px;
+
+}
+
+.matchCardPlayers {
+	margin-bottom: 1rem;
 }
 
 .ratingDelta {

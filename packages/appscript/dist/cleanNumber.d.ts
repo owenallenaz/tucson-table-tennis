@@ -1,1 +1,1 @@
-export default function cleanNumber(str: string): number | undefined;
+export default function cleanNumber(str: string | undefined): number | undefined;

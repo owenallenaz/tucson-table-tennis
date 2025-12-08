@@ -14,7 +14,7 @@ function getMatch(row, idA, aWins, idB, bWins) {
         bWins
     };
 }
-describe.only(__filename, function () {
+describe(__filename, function () {
     const tests = [
         {
             name: "2 player",

@@ -2,6 +2,7 @@ export declare const isNode: boolean;
 export declare const isAppsScript: boolean;
 export declare const TOURNAMENTS_COLUMN = "E";
 export declare const TOKEN_CELL = "G2";
+export declare const TOKEN_CELL_ADMIN = "H2";
 export declare const ADMIN_SHEET = "Admin";
 export declare const MATCH_SHEET = "Matches";
 export declare const MATCH_A_WINS_CELL = "F";

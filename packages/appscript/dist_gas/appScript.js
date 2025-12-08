@@ -39,15 +39,15 @@ function getSheetByName(name) {
 }
 
 function cleanValue(str) {
-  return str === "" ? undefined : str.toString();
+  return str === "" || str === undefined ? undefined : str.toString();
 }
 
 function cleanNumber(str) {
-  return str === "" ? undefined : Number(str);
+  return str === "" || str === undefined ? undefined : Number(str);
 }
 
 function cleanBoolean(str) {
-  return str === "" ? false : Boolean(str);
+  return str === "" || str === undefined ? false : Boolean(str);
 }
 
 function rawToRoster(raw) {
@@ -442,6 +442,12 @@ function calculateRatings(e, data) {
   const roster = getRosterRows(data.tournament);
   const matchRows = getMatchRows(data.tournament);
   const completedMatches = matchRows.filter(isComplete);
+  if (matchRows.length !== completedMatches.length) {
+    return {
+      success: false,
+      message: "All matches must be completed."
+    };
+  }
   const matches = completedMatches.map(val => {
     return {
       winner: val.winner,
@@ -459,6 +465,9 @@ function calculateRatings(e, data) {
     rosterSheet.getRange(`${ROSTER_NEW_RATING_CELL}${rowNumber}`).setValue(row.rating);
     rosterSheet.getRange(`${ROSTER_DELTA_CELL}${rowNumber}`).setValue(row.delta);
   }
+  return {
+    success: true
+  };
 }
 
 function addMatch(e, data) {

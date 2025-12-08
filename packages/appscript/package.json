@@ -33,7 +33,7 @@
 		"./lib/*": "./dist/*.js"
 	},
 	"scripts": {
-		"build": "rimraf dist_gas && rollup --config",
+		"build": "npm run build:js && npm run build:gas",
 		"build:js": "rimraf dist && tsc",
 		"build:gas": "rimraf dist_gas && rollup --config",
 		"test": "dotenvx run -- mocha --import=dotenv/config --import=tsx  **/*.test.ts "

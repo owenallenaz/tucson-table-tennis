@@ -1,3 +1,3 @@
-export default function cleanBoolean(str: string): boolean {
-    return str === "" ? false : Boolean(str);
+export default function cleanBoolean(str: string | undefined): boolean {
+    return str === "" || str === undefined ? false : Boolean(str);
 }

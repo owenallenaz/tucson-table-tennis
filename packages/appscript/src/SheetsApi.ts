@@ -1,40 +1,34 @@
-import getGoogleToken from "./getGoogleToken.js";
+const apiBase = `https://sheets.googleapis.com/v4/spreadsheets`;
+
+type SheetCell = string | null
 
 export default class SheetsApi {
-	#email: string
-	#privateKey: string
 	#sheet: string
-	#token?: string
+	#token: string
 	constructor({
-		email,
-		privateKey,
+		token,
 		sheet
 	}: {
-		email: string
-		privateKey: string
+		token: string
 		sheet: string
 	}) {
-		this.#email = email;
-		this.#privateKey = privateKey;
+		this.#token = token;
 		this.#sheet = sheet;
 	}
 	async readRange(range: string): Promise<string[][]> {
-		const token = await this.#getToken();
-
-		const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.#sheet}/values/${encodeURIComponent(range)}`;
+		const url = `${apiBase}/${this.#sheet}/values/${encodeURIComponent(range)}`;
 
 		const res = await fetch(url, {
 			headers: {
-				Authorization: `Bearer ${token}`
+				Authorization: `Bearer ${this.#token}`
 			}
 		});
 
 		const data = await res.json() as { values: string[][] };
 		return data.values || [];
 	}
-	async updateRange(range: string, values: string[][]) {
-		const token = await this.#getToken();
-		const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.#sheet}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+	async updateRange(range: string, values: SheetCell[][]) {
+		const url = `${apiBase}/${this.#sheet}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
 
 		const body = {
 			values
@@ -43,16 +37,20 @@ export default class SheetsApi {
 		await fetch(url, {
 			method: "PUT",
 			headers: {
-				Authorization: `Bearer ${token}`,
+				Authorization: `Bearer ${this.#token}`,
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify(body)
 		});
 	}
-	async #getToken(): Promise<string> {
-		if (this.#token) { return this.#token; }
-
-		this.#token = await getGoogleToken(this.#email, this.#privateKey);
-		return this.#token;
+	async clearRange(range: string) {
+		const url = `${apiBase}/${this.#sheet}/values/${encodeURIComponent(range)}:clear`;
+		await fetch(url, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${this.#token}`,
+				"Content-Type": "application/json"
+			}
+		});
 	}
 }

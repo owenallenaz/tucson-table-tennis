@@ -19,10 +19,14 @@ export default function MatchCard({ match }: { match: MatchRow }) {
 
 	return (
 		<article>
-			<div>
-				<PlayerChip id={players.first.id} wins={players.firstWins} delta={players.firstDelta} winner={players.first.id === match.winner}/>
-				<span className="vs">vs</span>
-				<PlayerChip id={players.second.id} wins={players.secondWins} delta={players.secondDelta} winner={players.second.id === match.winner}/>
+			<div className="matchCardPlayers">
+				<div>
+					<PlayerChip id={players.first.id} wins={players.firstWins} delta={players.firstDelta} winner={players.first.id === match.winner}/>
+				</div>
+				<div className="vs">vs</div>
+				<div>
+					<PlayerChip id={players.second.id} wins={players.secondWins} delta={players.secondDelta} winner={players.second.id === match.winner}/>
+				</div>
 			</div>
 			<div>
 				<Button onClick={onEdit}>Edit</Button>

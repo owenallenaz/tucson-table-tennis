@@ -1,1 +1,1 @@
-export default function cleanValue(str: string): string | undefined;
+export default function cleanValue(str: string | undefined): string | undefined;
