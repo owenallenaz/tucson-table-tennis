@@ -15,7 +15,6 @@ export default function Roster({ players }: { players: RosterRow[] }) {
 					<tr>
 						<th>Name</th>
 						<th>Rating</th>
-						<th>Pool</th>
 						{
 							isComplete &&
 							<>
@@ -23,6 +22,7 @@ export default function Roster({ players }: { players: RosterRow[] }) {
 								<th>Delta</th>
 							</>
 						}
+						<th>Pool</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -32,7 +32,6 @@ export default function Roster({ players }: { players: RosterRow[] }) {
 								<tr key={val.id}>
 									<td><NavLink to={`players/${val.id}`}>{val.name}</NavLink></td>
 									<td>{val.rating}</td>
-									<td>{val.pool}</td>
 									{
 										isComplete &&
 										<>
@@ -40,6 +39,7 @@ export default function Roster({ players }: { players: RosterRow[] }) {
 											<td>{val.delta}</td>
 										</>
 									}
+									<td>{val.pool}</td>
 								</tr>
 							)
 						})

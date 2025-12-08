@@ -46,6 +46,7 @@ export default function Tournament() {
 	return (
 		<div className="tournament">
 			<BackButton to="/"/>
+			<h3>Tournament - {data.tournament}</h3>
 			<Loading loading={!data.isLoaded}/>
 			{
 				data.isLoaded && data.pools.length > 0 && <Pools pools={data.pools}/>
