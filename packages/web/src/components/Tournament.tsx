@@ -41,7 +41,7 @@ export default function Tournament() {
 		setIsUpdatingRatings(false);
 	}
 
-	const isCompleted = data.isLoaded && data.matches.every(val => val.completed);
+	const isCompleted = data.isLoaded && data.matches.every(val => val.completed) && data.matches.length > 0;
 
 	return (
 		<div className="tournament">
