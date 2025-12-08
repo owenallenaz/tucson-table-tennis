@@ -39,7 +39,7 @@ export default function PoolPlayers({ matches }: { matches: MatchRow[] }) {
 	});
 
 	return (
-		<article>
+		<article className="poolPlayers">
 			<h4>{poolComplete ? "Complete" : "In Progress" }</h4>
 			<table>
 				<thead>

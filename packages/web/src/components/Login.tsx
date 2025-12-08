@@ -33,6 +33,7 @@ export default function Login() {
 				/>
 				<button aria-busy={loading} onClick={onSubmit}>Login</button>
 			</fieldset>
+			<p>If you do not know the password, ask another member of the club or a board member.</p>
 		</form>
 	)
 }
